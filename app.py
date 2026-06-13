@@ -118,7 +118,7 @@ with btn_col1:
             df = get_data()
             
             # 4.2 ตรวจสอบเลขหนังสือซ้ำ (Duplicate Check)
-            if not df.empty and doc_number in df['เลขหนังสือ'].astype(str).values:
+            if not df.empty and doc_number != "-" and doc_number in df['เลขหนังสือ'].astype(str).values:
                 st.error(f"❌ มีเลขหนังสือ {doc_number} ในระบบแล้ว ไม่สามารถบันทึกซ้ำได้")
             else:
                 # 4.3 เตรียมข้อมูลใหม่
@@ -168,15 +168,16 @@ st.markdown("---")
 # ==========================================
 # 5. ฟังก์ชันสรุปยอดรถรายวัน
 # ==========================================
-st.subheader("📊 ฟังก์ชันสรุปยอดรวมจำนวนรถขอเข้าจอดวันนี้ (แยกตามสำนัก)")
+st.subheader("📊 ฟังก์ชันสรุปยอดรวมจำนวนรถขอเข้าจอด (แยกตามสำนัก)")
 
 df_display = get_data()
-today_str = date.today().strftime("%d/%m/%Y")
+summary_date = st.date_input("เลือกวันที่ต้องการดูสรุปผล", value=date.today(), format="DD/MM/YYYY")
+target_date_str = summary_date.strftime("%d/%m/%Y")
 
 if not df_display.empty:
     df_display['วันที่จอด'] = df_display['วันที่จอด'].astype(str)
-    # คัดกรองจาก วันที่จอด == วันปัจจุบัน
-    today_parking = df_display[df_display['วันที่จอด'] == today_str]
+    # คัดกรองจาก วันที่จอด == วันที่เลือก
+    today_parking = df_display[df_display['วันที่จอด'] == target_date_str]
     
     if not today_parking.empty:
         # แปลงจำนวนรถเป็นตัวเลขเพื่อคำนวณ
@@ -188,11 +189,10 @@ if not df_display.empty:
         # แสดงผล
         st.dataframe(summary_df, use_container_width=True)
         
-        # ยอดรวมทั้งหมดของวันนี้
         total_cars = int(summary_df['รวมจำนวนรถ (คัน)'].sum())
-        st.info(f"**ยอดรวมจำนวนรถขอเข้าจอดวันนี้ทั้งหมด: {total_cars} คัน**")
+        st.info(f"**ยอดรวมจำนวนรถขอเข้าจอดสำหรับวันที่ {target_date_str} ทั้งหมด: {total_cars} คัน**")
     else:
-        st.info("ยังไม่มีการขอเข้าจอดสำหรับวันที่จอดในวันนี้")
+        st.info(f"ยังไม่มีการขอเข้าจอดสำหรับวันที่ {target_date_str}")
 else:
     st.info("ยังไม่มีข้อมูลในระบบ")
 
@@ -201,16 +201,16 @@ st.markdown("---")
 # ==========================================
 # 6. ตารางรายละเอียดรายวัน (Data Visibility)
 # ==========================================
-st.subheader("📋 รายละเอียดรายการคำขอที่รับเรื่องในวันนี้")
+st.subheader("📋 รายละเอียดรายการคำขอที่รับเรื่อง")
 
 if not df_display.empty:
     df_display['วันที่รับเรื่อง'] = df_display['วันที่รับเรื่อง'].astype(str)
-    # คัดกรองจาก วันที่รับเรื่อง == วันปัจจุบัน
-    today_records = df_display[df_display['วันที่รับเรื่อง'] == today_str]
+    # คัดกรองจาก วันที่รับเรื่อง == วันที่เลือก
+    today_records = df_display[df_display['วันที่รับเรื่อง'] == target_date_str]
     
     if not today_records.empty:
         st.dataframe(today_records, use_container_width=True)
     else:
-        st.info("ไม่มีรายการคำขอที่รับเรื่องในวันนี้")
+        st.info(f"ไม่มีรายการคำขอที่รับเรื่องในวันที่ {target_date_str}")
 else:
     st.info("ยังไม่มีข้อมูลในระบบ")
