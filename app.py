@@ -183,8 +183,8 @@ if not df_display.empty:
         # แปลงจำนวนรถเป็นตัวเลขเพื่อคำนวณ
         today_parking['จำนวนรถ'] = pd.to_numeric(today_parking['จำนวนรถ'], errors='coerce').fillna(0)
         # จัดกลุ่มและรวมยอด
-        summary_df = today_parking.groupby('สำนัก')['จำนวนรถ'].sum().reset_index()
-        summary_df.columns = ['สำนัก', 'รวมจำนวนรถ (คัน)']
+        summary_df = today_parking.groupby(['สำนัก', 'อาคารที่จอด'])['จำนวนรถ'].sum().reset_index()
+        summary_df.columns = ['สำนัก', 'อาคารที่จอด', 'รวมจำนวนรถ (คัน)']
         
         # แสดงผล
         st.dataframe(summary_df, use_container_width=True)
