@@ -183,8 +183,8 @@ if not df_display.empty:
         # แปลงจำนวนรถเป็นตัวเลขเพื่อคำนวณ
         today_parking['จำนวนรถ'] = pd.to_numeric(today_parking['จำนวนรถ'], errors='coerce').fillna(0)
         # จัดกลุ่มและรวมยอด
-        summary_df = today_parking.groupby(['สำนัก', 'อาคารที่จอด'])['จำนวนรถ'].sum().reset_index()
-        summary_df.columns = ['สำนัก', 'อาคารที่จอด', 'รวมจำนวนรถ (คัน)']
+        summary_df = today_parking.groupby(['สำนัก', 'อาคารที่จอด', 'เวลาที่จอด'])['จำนวนรถ'].sum().reset_index()
+        summary_df.columns = ['สำนัก', 'อาคารที่จอด', 'เวลาที่จอด', 'รวมจำนวนรถ (คัน)']
         
         # แสดงผล
         st.dataframe(summary_df, use_container_width=True)
@@ -201,16 +201,17 @@ st.markdown("---")
 # ==========================================
 # 6. ตารางรายละเอียดรายวัน (Data Visibility)
 # ==========================================
-st.subheader("📋 รายละเอียดรายการคำขอที่รับเรื่อง")
-
-if not df_display.empty:
-    df_display['วันที่รับเรื่อง'] = df_display['วันที่รับเรื่อง'].astype(str)
-    # คัดกรองจาก วันที่รับเรื่อง == วันที่เลือก
-    today_records = df_display[df_display['วันที่รับเรื่อง'] == target_date_str]
+with st.expander("🔍 คลิกเปิด/ปิด เพื่อดูรายละเอียดรายการคำขอที่รับเรื่อง"):
+    st.subheader("📋 รายละเอียดรายการคำขอที่รับเรื่อง")
     
-    if not today_records.empty:
-        st.dataframe(today_records, use_container_width=True)
+    if not df_display.empty:
+        df_display['วันที่รับเรื่อง'] = df_display['วันที่รับเรื่อง'].astype(str)
+        # คัดกรองจาก วันที่รับเรื่อง == วันที่เลือก
+        today_records = df_display[df_display['วันที่รับเรื่อง'] == target_date_str]
+        
+        if not today_records.empty:
+            st.dataframe(today_records, use_container_width=True)
+        else:
+            st.info(f"ไม่มีรายการคำขอที่รับเรื่องในวันที่ {target_date_str}")
     else:
-        st.info(f"ไม่มีรายการคำขอที่รับเรื่องในวันที่ {target_date_str}")
-else:
-    st.info("ยังไม่มีข้อมูลในระบบ")
+        st.info("ยังไม่มีข้อมูลในระบบ")
