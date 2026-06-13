@@ -56,7 +56,7 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 @st.cache_data(ttl=5) # Cache data for 5 seconds to prevent spamming API
 def get_data():
     try:
-        df = conn.read(worksheet="ชีต1")
+        df = conn.read(worksheet="ชีต1", ttl=0)
         # สร้าง DataFrame ว่างถ้า Sheet ว่างเปล่า
         if df.empty or 'เลขหนังสือ' not in df.columns:
             return pd.DataFrame(columns=[
